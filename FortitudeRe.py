@@ -224,7 +224,7 @@ class requiredAmount(report):
         _temp=(1+self.portfolioIrr)**(self.frequency)-1
         _temp=(_temp-self.defaultRate)*self.haircut-self.expense                             
                                      
-        return (1+(__temp-self.defaultRate)*self.haircut-self.expense)**(1/self.frequency)-1
+        return (1+_temp)**(1/self.frequency)-1
 
     #adjust the phoenix rates by deducting haircut default and expenses  
     def adjustedPhoenixRatesC(self):
