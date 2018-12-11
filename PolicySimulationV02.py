@@ -7,7 +7,7 @@ import pandas as pd
 def sigmoid(x):
     return 1/(1+np.exp(-x))
 
-#this class generates claim costs
+#this class generates claim costs x
 class ClaimCost:
     def __init__(self):
         #based on products specs those appears to be the values for low, expected and high
