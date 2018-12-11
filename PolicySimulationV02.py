@@ -273,14 +273,14 @@ class Policy:
     def timestepSoa(self):
         #move forward in time
         self.policyHolder.time+=1
-        #refresh cancer odds
+        #increase age by 1 year
         __currentAge=self.policyHolder.time+self.policyHolder.age
+        #get cancer incidence
         self.policyholder.cancerOdds=self.cancer.incidenceTable[(self.policyHolder.male,__currentAge)]
         #calculate odds of dying during current period
         #oddsOfDying=self.policyHolder.calculateOddsofDying()
-        oddsOfDying=self.policyHolder.qxActTable()
         #add this info ot the dictionary of the human
-        self.policyHolder.oddsOfDying[self.policyHolder.time]=oddsOfDying
+        self.policyHolder.oddsOfDying[self.policyHolder.time]=self.policyHolder.qxActTable()
         #assess if dead
         self.policyHolder.assessDeath()
         #assess cancer incidence
@@ -291,8 +291,11 @@ class Policy:
         if self.policyHolder.isDead==True:
             done=True
         else:
+            #you are alive but you might get a non-lethal cancer
+            self.curableCancerClaim,premium,done=self.nonLethalCancerIncidence()
+    
             done=False
-            return self.actualClaim,premium,done
+        return (self.actualClaim+self.curableCancerClaim),self.premium,done
             
     def timestep(self):
         #move forward in time
