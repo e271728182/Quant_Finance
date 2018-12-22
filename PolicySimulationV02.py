@@ -282,15 +282,16 @@ class Policy:
             return curableCancerClaim,premium,done
 
     def transferPolicy(self):
-		_doa=self.policyHolder.assessIfSpouseAlive()
+	    _doa=self.policyHolder.assessIfSpouseAlive()
+        done=True
 		if self.policyHolder.married==True and _doa==True and self.policyHolder.isDead==True:
                     #you married someone younger than you
 			self.policyHolder.performSexChange()
                     #well we're not done yet!
             done=False
-            return self.actualClaim,premium,done
+            return False
         else:
-			return self.actualClaim,premium,done
+			return True
 					
         #if alive and not cancer plagged carry on to next time step
             
@@ -314,47 +315,29 @@ class Policy:
             if self.policyHolder.cancer==True:
                 #self.actualClaim=self.claimCost.calculateExpectedCost()
                 self.actualClaim,self.premium=self.cancerCosts()
-                #verify you don't have to add medical inflation
-                #if self.claimCost.medInflation==False:
-                    #pass
-                #else:
-                    #add random medical inflation
-                    #self.actualClaim=self.actualClaim*self.claimCost.calcMedInfAdj(self.policyHolder.time)  
-                #premium is waived when you die from cancer and from the moment you got diagnosed
-                
-                #premium=-self.premium*self.cancer.assignCancerDuration()
-                #premium=0
+   
                 done=True
                 return self.actualClaim,premium,done
             #if you are dead but not from Cancer you are out but you cost 0
-
             else:
                 self.actualClaim=0
                 premium=self.payPremium()
                 done=True
                 # but wait a minute, if you are married you can transfer the policy to wifey!
                 #first verify the spouse is alive:
-                _doa=self.policyHolder.assessIfSpouseAlive()
-                if self.policyHolder.married==True and _doa==True:
-                    #you married someone younger than you
-                    self.policyHolder.performSexChange()
-                    #well we're not done yet!
-                    done=False
-                    return self.actualClaim,premium,done
-                else:
-                    return self.actualClaim,premium,done    
-		
+                done=self.transferPolicy()
+        
+                return self.actualClaim,premium,done
+                   		
 		#verify that you haven't got cancer but a curable one(if such thing exists)
-        else:
-            self.policyHolder.assessIfWillSufferCurableCancer()
-            #if self.policyHolder.hasSurvivedCancer==True and self.paidCurableCancerClaim==False:
-                #self.curableCancerClaim=0.5*self.claimCost.calculateExpectedCost()
-                #premium=-0.5*self.premium*self.cancer.assignCancerDuration()
-                #done=False
-                #self.paidCurableCancerClaim=True
+        elseif self.policyHolder.isDead==False:
+            
+            if self.policyHolder.hasSurvivedCancer==False:
+                self.policyHolder.assessIfWillSufferCurableCancer()
+
                 curableCancerClaim,premium,done=self.nonLethalCancerIncidence()
                 return self.curableCancerClaim,premium,done
-            #if alive and not cancer plagged carry on to next time step
+            #you are not dead, did not get cancer during the year
             else:    
                 premium=self.payPremium()
                 treatmentCost=0
@@ -362,7 +345,7 @@ class Policy:
                 #done=False
                 return self.actualClaim,premium,done
 
-    def simulation(self,nbsim,discount=0.040):
+    def simulation(self,nbsim,discount=0.045):
         # a simulation moves a policy step by step through time and accumulates a PV of premiums and costs over time.
         #default discount is flat 4%t
         __results={}
