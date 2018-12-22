@@ -269,33 +269,30 @@ class Policy:
             
         return __premium,__claim
 #gp:this function is too big is should be broken into more more methods!    
-
-    def timestepSoa(self):
-        #move forward in time
-        self.policyHolder.time+=1
-        #increase age by 1 year
-        __currentAge=self.policyHolder.time+self.policyHolder.age
-        #get cancer incidence
-        self.policyholder.cancerOdds=self.cancer.incidenceTable[(self.policyHolder.male,__currentAge)]
-        #calculate odds of dying during current period
-        #oddsOfDying=self.policyHolder.calculateOddsofDying()
-        #add this info ot the dictionary of the human
-        self.policyHolder.oddsOfDying[self.policyHolder.time]=self.policyHolder.qxActTable()
-        #assess if dead
-        self.policyHolder.assessDeath()
-        #assess cancer incidence
-        self.policyHolder.assessCancer()
-        #calculateCancerCosts
-        premium,self.currentClaim=self.cancerCosts()            
+    def nonLethalCancerIncidence(self):
         
-        if self.policyHolder.isDead==True:
-            done=True
-        else:
-            #you are alive but you might get a non-lethal cancer
-            self.curableCancerClaim,premium,done=self.nonLethalCancerIncidence()
-    
+        #verify that you haven't got cancer but a curable one(if such thing exists)
+        
+        self.policyHolder.assessIfWillSufferCurableCancer()
+        if self.policyHolder.hasSurvivedCancer==True and self.paidCurableCancerClaim==False:
+            curableCancerClaim=0.5*self.claimCost.calculateExpectedCost()
+            premium=-self.premium*self.cancer.assignCancerDuration()
             done=False
-        return (self.actualClaim+self.curableCancerClaim),self.premium,done
+            self.paidCurableCancerClaim=True
+            return curableCancerClaim,premium,done
+
+    def transferPolicy(self):
+		_doa=self.policyHolder.assessIfSpouseAlive()
+		if self.policyHolder.married==True and _doa==True and self.policyHolder.isDead==True:
+                    #you married someone younger than you
+			self.policyHolder.performSexChange()
+                    #well we're not done yet!
+            done=False
+            return self.actualClaim,premium,done
+        else:
+			return self.actualClaim,premium,done
+					
+        #if alive and not cancer plagged carry on to next time step
             
     def timestep(self):
         #move forward in time
@@ -315,21 +312,22 @@ class Policy:
 
             #if both dead AND from Cancer then simulate an expected cost 
             if self.policyHolder.cancer==True:
-                self.actualClaim=self.claimCost.calculateExpectedCost()
-                
+                #self.actualClaim=self.claimCost.calculateExpectedCost()
+                self.actualClaim,self.premium=self.cancerCosts()
                 #verify you don't have to add medical inflation
-                if self.claimCost.medInflation==False:
-                    pass
-                else:
+                #if self.claimCost.medInflation==False:
+                    #pass
+                #else:
                     #add random medical inflation
-                    self.actualClaim=self.actualClaim*self.claimCost.calcMedInfAdj(self.policyHolder.time)  
+                    #self.actualClaim=self.actualClaim*self.claimCost.calcMedInfAdj(self.policyHolder.time)  
                 #premium is waived when you die from cancer and from the moment you got diagnosed
                 
-                premium=-self.premium*self.cancer.assignCancerDuration()
+                #premium=-self.premium*self.cancer.assignCancerDuration()
                 #premium=0
                 done=True
                 return self.actualClaim,premium,done
             #if you are dead but not from Cancer you are out but you cost 0
+
             else:
                 self.actualClaim=0
                 premium=self.payPremium()
@@ -344,16 +342,17 @@ class Policy:
                     done=False
                     return self.actualClaim,premium,done
                 else:
-                    return self.actualClaim,premium,done
-        
-        #verify that you haven't got cancer but a curable one(if such thing exists)
+                    return self.actualClaim,premium,done    
+		
+		#verify that you haven't got cancer but a curable one(if such thing exists)
         else:
             self.policyHolder.assessIfWillSufferCurableCancer()
-            if self.policyHolder.hasSurvivedCancer==True and self.paidCurableCancerClaim==False:
-                self.curableCancerClaim=0.5*self.claimCost.calculateExpectedCost()
-                premium=-0.5*self.premium*self.cancer.assignCancerDuration()
-                done=False
-                self.paidCurableCancerClaim=True
+            #if self.policyHolder.hasSurvivedCancer==True and self.paidCurableCancerClaim==False:
+                #self.curableCancerClaim=0.5*self.claimCost.calculateExpectedCost()
+                #premium=-0.5*self.premium*self.cancer.assignCancerDuration()
+                #done=False
+                #self.paidCurableCancerClaim=True
+                curableCancerClaim,premium,done=self.nonLethalCancerIncidence()
                 return self.curableCancerClaim,premium,done
             #if alive and not cancer plagged carry on to next time step
             else:    
