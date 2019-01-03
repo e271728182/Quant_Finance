@@ -31,6 +31,13 @@ def createDateDict(dictList):
         dateDict[value]=count
         count=count+1
     return dateDict
+def truncBeforeValDate(dictio,valDate,keyDict,keyValue)
+    for item in dictio:
+    if datetime.strptime(valDate,'%Y-%m-%d')<=datetime.strptime(dictio['date'],'%Y-%m-%d'):
+        c[count]=item[key]
+        count=count+1
+    return c
+
 class asset:
     def __init__(self):
         self.isin='abc'
