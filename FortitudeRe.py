@@ -33,9 +33,9 @@ def createDateDict(dictList):
 
 def truncBeforeValDate(dictio,valDate,keyDict,keyValue):
     for item in dictio:
-    if datetime.strptime(valDate,'%Y-%m-%d')<=datetime.strptime(dictio['date'],'%Y-%m-%d'):
-        c[count]=item[key]
-        count=count+1
+        if datetime.strptime(valDate,'%Y-%m-%d')<=datetime.strptime(dictio['date'],'%Y-%m-%d'):
+            c[count]=item[key]
+            count=count+1
     return c
 def convertCFUsdToLcl(exRate,assetCf):
     return {k:v*exRate for (k,v) in assetCf.items()}
