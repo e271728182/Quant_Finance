@@ -9,6 +9,12 @@ def sumNestedDict(dictio,key):
     for value in dictio.values():
         _total=_total+value[key]
     return _total
+def obtainFxSpot(dframe,currencyKey,usdKey,lclKey):
+    #create a dictionary of spot fx rates from a dataframe of market values
+    df1=dframe.groupby(currencyKey).agg({lclKey: "sum",usdKey: "sum"})
+    df1['fx']=df1[lclKey]/df1[usdKey]
+    df1=df1[['fx']]
+    return df1.to_dict('index')
 
 def indexBasedDict(dateDictio,dateCf,dateCfKey):
  #given  a key=date value=cf dictionary transform the key to an index based on a
