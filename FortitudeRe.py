@@ -159,7 +159,7 @@ class lossRec(report):
         self.totalEarning=dict()
         self.endCf=dict()
         self.liborFreqSpreadAdj=dict()
-        self.lgTermReinvRatesAdj={k:0.06/12 for k in range(1,105*self.frequency)}
+        self.lgTermReinvRatesAdj={k:0.00/12 for k in range(1,105*self.frequency)}
         self.weightVc=dict()
         self.reinvAssets=dict()
         self.shadowLoss=0
