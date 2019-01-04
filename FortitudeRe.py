@@ -31,13 +31,13 @@ def createDateDict(dictList):
         count=count+1
     return dateDict
 
-def truncBeforeValDate(dictio,valDate,keyDict,keyValue)
+def truncBeforeValDate(dictio,valDate,keyDict,keyValue):
     for item in dictio:
     if datetime.strptime(valDate,'%Y-%m-%d')<=datetime.strptime(dictio['date'],'%Y-%m-%d'):
         c[count]=item[key]
         count=count+1
     return c
-def convertCFUsdToLcl(exRate,assetCf)
+def convertCFUsdToLcl(exRate,assetCf):
     return {k:v*exRate for (k,v) in assetCf.items()}
 class asset:
     def __init__(self):
