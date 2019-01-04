@@ -37,8 +37,8 @@ def truncBeforeValDate(dictio,valDate,keyDict,keyValue)
         c[count]=item[key]
         count=count+1
     return c
-def convertCFUsdToLcl(self,exRate,assetCf)
-    return {k:v/exRate for (k,v) in assetCf.items()}
+def convertCFUsdToLcl(exRate,assetCf)
+    return {k:v*exRate for (k,v) in assetCf.items()}
 class asset:
     def __init__(self):
         self.isin='abc'
