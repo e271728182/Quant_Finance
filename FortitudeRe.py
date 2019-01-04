@@ -23,7 +23,6 @@ def createDateDict(dictList):
         uniqueDates.update(set(item.keys()))
 
 
-
     uniqueDates=sorted(list(uniqueDates))
     dateDict={}
     count=1
@@ -31,13 +30,15 @@ def createDateDict(dictList):
         dateDict[value]=count
         count=count+1
     return dateDict
+
 def truncBeforeValDate(dictio,valDate,keyDict,keyValue)
     for item in dictio:
     if datetime.strptime(valDate,'%Y-%m-%d')<=datetime.strptime(dictio['date'],'%Y-%m-%d'):
         c[count]=item[key]
         count=count+1
     return c
-
+def convertCFUsdToLcl(self,exRate,assetCf)
+    return {k:v/exRate for (k,v) in assetCf.items()}
 class asset:
     def __init__(self):
         self.isin='abc'
@@ -51,6 +52,7 @@ class asset:
         self.valDate='1900-01-01'
         self.cashFlowsLclcurrent={}
         self.cashFlowsUsdCurrent={}
+        self.exRateUsdToLcl=1
 
 
 #Base class for every calculation that is basically a set of asset CF+its key financial info and a liablity
