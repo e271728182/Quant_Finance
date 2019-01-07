@@ -7,7 +7,7 @@ import pandas as pd
 def sigmoid(x):
     return 1/(1+np.exp(-x))
 
-#this class generates claim costs
+#this class generates claim costs x
 class ClaimCost:
     def __init__(self):
         #based on products specs those appears to be the values for low, expected and high
@@ -269,30 +269,31 @@ class Policy:
             
         return __premium,__claim
 #gp:this function is too big is should be broken into more more methods!    
-
-    def timestepSoa(self):
-        #move forward in time
-        self.policyHolder.time+=1
-        #refresh cancer odds
-        __currentAge=self.policyHolder.time+self.policyHolder.age
-        self.policyholder.cancerOdds=self.cancer.incidenceTable[(self.policyHolder.male,__currentAge)]
-        #calculate odds of dying during current period
-        #oddsOfDying=self.policyHolder.calculateOddsofDying()
-        oddsOfDying=self.policyHolder.qxActTable()
-        #add this info ot the dictionary of the human
-        self.policyHolder.oddsOfDying[self.policyHolder.time]=oddsOfDying
-        #assess if dead
-        self.policyHolder.assessDeath()
-        #assess cancer incidence
-        self.policyHolder.assessCancer()
-        #calculateCancerCosts
-        premium,self.currentClaim=self.cancerCosts()            
+    def nonLethalCancerIncidence(self):
         
-        if self.policyHolder.isDead==True:
-            done=True
-        else:
+        #verify that you haven't got cancer but a curable one(if such thing exists)
+        
+        self.policyHolder.assessIfWillSufferCurableCancer()
+        if self.policyHolder.hasSurvivedCancer==True and self.paidCurableCancerClaim==False:
+            curableCancerClaim=0.85*self.claimCost.calculateExpectedCost()
+            premium=-self.premium*self.cancer.assignCancerDuration()
             done=False
-            return self.actualClaim,premium,done
+            self.paidCurableCancerClaim=True
+            return curableCancerClaim,premium,done
+
+    def transferPolicy(self):
+	    _doa=self.policyHolder.assessIfSpouseAlive()
+        done=True
+		if self.policyHolder.married==True and _doa==True and self.policyHolder.isDead==True:
+                    #you married someone younger than you
+			self.policyHolder.performSexChange()
+                    #well we're not done yet!
+            done=False
+            return False
+        else:
+			return True
+					
+        #if alive and not cancer plagged carry on to next time step
             
     def timestep(self):
         #move forward in time
@@ -312,18 +313,9 @@ class Policy:
 
             #if both dead AND from Cancer then simulate an expected cost 
             if self.policyHolder.cancer==True:
-                self.actualClaim=self.claimCost.calculateExpectedCost()
-                
-                #verify you don't have to add medical inflation
-                if self.claimCost.medInflation==False:
-                    pass
-                else:
-                    #add random medical inflation
-                    self.actualClaim=self.actualClaim*self.claimCost.calcMedInfAdj(self.policyHolder.time)  
-                #premium is waived when you die from cancer and from the moment you got diagnosed
-                
-                premium=-self.premium*self.cancer.assignCancerDuration()
-                #premium=0
+                #self.actualClaim=self.claimCost.calculateExpectedCost()
+                self.actualClaim,self.premium=self.cancerCosts()
+   
                 done=True
                 return self.actualClaim,premium,done
             #if you are dead but not from Cancer you are out but you cost 0
@@ -333,26 +325,19 @@ class Policy:
                 done=True
                 # but wait a minute, if you are married you can transfer the policy to wifey!
                 #first verify the spouse is alive:
-                _doa=self.policyHolder.assessIfSpouseAlive()
-                if self.policyHolder.married==True and _doa==True:
-                    #you married someone younger than you
-                    self.policyHolder.performSexChange()
-                    #well we're not done yet!
-                    done=False
-                    return self.actualClaim,premium,done
-                else:
-                    return self.actualClaim,premium,done
+                done=self.transferPolicy()
         
-        #verify that you haven't got cancer but a curable one(if such thing exists)
-        else:
-            self.policyHolder.assessIfWillSufferCurableCancer()
-            if self.policyHolder.hasSurvivedCancer==True and self.paidCurableCancerClaim==False:
-                self.curableCancerClaim=0.5*self.claimCost.calculateExpectedCost()
-                premium=-0.5*self.premium*self.cancer.assignCancerDuration()
-                done=False
-                self.paidCurableCancerClaim=True
+                return self.actualClaim,premium,done
+                   		
+		#verify that you haven't got cancer but a curable one(if such thing exists)
+        elseif self.policyHolder.isDead==False:
+            
+            if self.policyHolder.hasSurvivedCancer==False:
+                self.policyHolder.assessIfWillSufferCurableCancer()
+
+                curableCancerClaim,premium,done=self.nonLethalCancerIncidence()
                 return self.curableCancerClaim,premium,done
-            #if alive and not cancer plagged carry on to next time step
+            #you are not dead, did not get cancer during the year
             else:    
                 premium=self.payPremium()
                 treatmentCost=0
@@ -360,7 +345,7 @@ class Policy:
                 #done=False
                 return self.actualClaim,premium,done
 
-    def simulation(self,nbsim,discount=0.040):
+    def simulation(self,nbsim,discount=0.045):
         # a simulation moves a policy step by step through time and accumulates a PV of premiums and costs over time.
         #default discount is flat 4%t
         __results={}
