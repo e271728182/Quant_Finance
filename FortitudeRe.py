@@ -215,7 +215,7 @@ class lossRec(report):
         self.asset=self.totalCf()
 
         self.liborFreqSpreadAdj=self.liborFreqSpreadAdjC()
-
+#modify this function
         __adj=1/(1+self.defaultRate+self.expense)**(1/self.frequency)
         self.adjVectorCF=self.defaultAdjVectorC(__adj)
 
@@ -270,15 +270,9 @@ class requiredAmount(report):
     def adjustedPortfolioIrrC(self):
         _temp=0.0
         _temp=(1+self.portfolioIrr)**(self.frequency)-1
-<<<<<<< HEAD
         _temp=(_temp-self.defaultRate)*self.haircut-self.expense
 
-        return (1+(__temp-self.defaultRate)*self.haircut-self.expense)**(1/self.frequency)-1
-=======
-        _temp=(_temp-self.defaultRate)*self.haircut-self.expense                             
-                                     
         return (1+_temp)**(1/self.frequency)-1
->>>>>>> 7cfabda2f691ceb0b0247173ac37b7780abedc01
 
     #adjust the phoenix rates by deducting haircut default and expenses
     def adjustedPhoenixRatesC(self):
@@ -381,23 +375,3 @@ def selectByDate(itemList,valDate,dateKey,itemKey):
             __container[__count]=item[itemKey]
             __count=count+1
     return __container
-
-def mkDateTime(dateString,strFormat="%Y-%m-%d"):
-    # Expects "YYYY-MM-DD" string
-    # returns a datetime object
-    eSeconds = time.mktime(time.strptime(dateString,strFormat))
-    return datetime.datetime.fromtimestamp(eSeconds)
-
-def mkLastOfMonth(dtDateTime):
-    dYear = dtDateTime.strftime("%Y")        #get the year
-    dMonth = str(int(dtDateTime.strftime("%m"))%12+1)#get next month, watch rollover
-    dDay = "1"                               #first day of next month
-    nextMonth = mkDateTime("%s-%s-%s"%(dYear,dMonth,dDay))#make a datetime obj for 1st of next month
-    delta = datetime.timedelta(seconds=1)    #create a delta of 1 second
-    return nextMonth - delta                 #subtract from nextMonth and return
-
-def mkFirstOfMonth(dtDateTime):
-    #what is the first day of the current month
-    #format the year and month + 01 for the current datetime, then form it back
-    #into a datetime object
-    return mkDateTime(formatDate(dtDateTime,"%Y-%m-01"))
