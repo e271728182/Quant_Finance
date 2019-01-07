@@ -275,7 +275,7 @@ class Policy:
         
         self.policyHolder.assessIfWillSufferCurableCancer()
         if self.policyHolder.hasSurvivedCancer==True and self.paidCurableCancerClaim==False:
-            curableCancerClaim=0.5*self.claimCost.calculateExpectedCost()
+            curableCancerClaim=0.85*self.claimCost.calculateExpectedCost()
             premium=-self.premium*self.cancer.assignCancerDuration()
             done=False
             self.paidCurableCancerClaim=True
