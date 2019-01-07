@@ -174,7 +174,7 @@ class lossRec(report):
         __values={}
         for k,v in self.bondAmorSchedule.items():
             if k==1:
-            __values[k]=self.bv*v
+                __values[k]=self.bv*v
             else:
                 __values[k]=__values[k-1]*v
         return __values
