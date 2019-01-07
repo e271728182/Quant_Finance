@@ -216,7 +216,7 @@ class lossRec(report):
 
         self.liborFreqSpreadAdj=self.liborFreqSpreadAdjC()
 
-        __adj=1/(1+self.defaultRate+self.expense)
+        __adj=1/(1+self.defaultRate+self.expense)**(1/self.frequency)
         self.adjVectorCF=self.defaultAdjVectorC(__adj)
 
         self.adjustedAsset=self.adjCfC()
