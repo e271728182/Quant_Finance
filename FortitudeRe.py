@@ -170,8 +170,14 @@ class lossRec(report):
         return {k:(1+v+self.liborSpread)**(1/self.frequency)-1 for (k,v) in self.liborUk6m.items()}
 
     def bookValuebondsC(self):
-
-        return {k:(v*self.bv) for (k,v) in self.bondAmorSchedule.items()}
+        #create a bond amortization schedule based on the fixed assumptions
+        __values={}
+        for k,v in self.bondAmorSchedule.items():
+            if k==1:
+            __values[k]=self.bv*v
+            else:
+                __values[k]=__values[k-1]*v
+        return __values
 
     def accumulateCf(self):
         self.totalReinvAmt[0]=0
