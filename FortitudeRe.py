@@ -37,12 +37,7 @@ def createDateDict(dictList):
         count=count+1
     return dateDict
 
-def truncBeforeValDate(dictio,valDate,keyDict,keyValue):
-    for item in dictio:
-        if datetime.strptime(valDate,'%Y-%m-%d')<=datetime.strptime(dictio['date'],'%Y-%m-%d'):
-            c[count]=item[key]
-            count=count+1
-    return c
+
 def convertCFUsdToLcl(exRate,assetCf):
     return {k:v*exRate for (k,v) in assetCf.items()}
 class asset:
@@ -366,12 +361,12 @@ class requiredAmount(report):
         self.collateralReq=self.collateralReqC()
 
 def selectByDate(itemList,valDate,dateKey,itemKey):
-#function to select from a presorted list items where date >= than report valuation date
+#function to select from a presorted list items where date > than report valuation date
     __count=1
     __container={}
 
     for item in itemList:
-        if datetime.strptime(valDate,'%Y-%m-%d')<=datetime.strptime(item[dateKey],'%Y-%m-%d'):
+        if datetime.strptime(valDate,'%Y-%m-%d')<datetime.strptime(item[dateKey],'%Y-%m-%d'):
             __container[__count]=item[itemKey]
-            __count=count+1
+            __count=__count+1
     return __container
