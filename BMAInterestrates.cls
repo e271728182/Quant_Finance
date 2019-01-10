@@ -85,27 +85,24 @@ Public Sub init(interestRateRange As range, spread As Double)
      Me.createFutureSpot
 
 End Sub
+Sub dumpCF(ByRef vector, range)
+For i = 1 To UBound(pLiabilityVector)
+range(range).Cells(i) = vector(i)
+Next i
+End Sub
 Public Sub createFutureSpot()
     futureT = 10
     For i = 1 To UBound(pBMAStandardRates10)
-    Select Case i
-    
-    Case Is = 1
+
         temp = (1 + pBMAStandardRates(futureT)) ^ futureT
-        temp2 = (1 + pBMAStandardRates(futureT - 1)) ^ (futureT - 1)
-        temp3 = temp / temp2 - 1
-        pBMAStandardRates10(i) = temp3
-   Case Else
-        'compound previous spot rate
-        temp = (1 + pBMAStandardRates10(i - 1)) ^ (i - 1)
         'find forward 1 year rate from original spot curve
         temp2 = (1 + pBMAStandardRates(futureT + i)) ^ (futureT + i)
-        temp3 = (1 + pBMAStandardRates(futureT + i - 1)) ^ (futureT + i - 1)
-        'find spot rate
-        temp4 = (temp * temp2 / temp3) ^ (1 / i) - 1
+
+        temp4 = (temp2 / temp) ^ (1 / i) - 1
         pBMAStandardRates10(i) = temp4
-    End Select
+    
     Next i
+    
 End Sub
 
 Public Sub addSpreadToBMACurves()
@@ -257,7 +254,7 @@ Case 7
         End Select
     Next i
 'Case 8
-
+'
 '    For i = 1 To UBound(pBMAStandardRates)
 '        Select Case i
 '
@@ -270,7 +267,7 @@ Case 7
 '            'add the temp value to the bermuda rates
 '            pBMACurrentScenarioRates(i) = WorksheetFunction.Max(0, pBMAStandardRates(i) + temp)
 '
-'        Case Is <= 40
+'        Case Is <= 31
 '            'Start at -1% and and decrease linearly over 20 years to -0.5%
 '            temp = 0.01 - 0.005 * (i - 21) / 20
 '            'add the temp value to the bermuda rates
@@ -307,7 +304,7 @@ Case 8
         Select Case i
         Case Is < 10
         pBMACurrentScenarioRates(i) = pBMAStandardRates(i)
-        
+
         Case Else
         'forward rate between 0-10 is spot compounded
         temp = (1 + pBMACurrentScenarioRates(9)) ^ 9
@@ -315,10 +312,15 @@ Case 8
         temp2 = (1 + pBMACurrentScenario10(maxtime)) ^ (maxtime)
         temp3 = (temp * temp2) ^ (1 / i)
         pBMACurrentScenarioRates(i) = temp3 - 1
-        
+
         End Select
         Next i
-
+    For i = 1 To UBound(pBMAStandardRates10)
+    
+        range("ForwardTerm").Cells(i) = pBMAStandardRates10(i)
+        range("ForwardTermShock").Cells(i) = pBMACurrentScenario10(i)
+       Next i
+       
 End Select
 
 End Sub
@@ -561,5 +563,6 @@ Dim temp As Double
         End Select
     Next i
     
+ 
 End Sub
 
