@@ -82,7 +82,7 @@ Public Sub init(interestRateRange As range, spread As Double)
     'assigning a key for later ID
     Me.key = "ABCDE"
     
-     Me.createFutureSpot
+     'Me.createFutureSpot
 
 End Sub
 Sub dumpCF(ByRef vector, range)
@@ -232,27 +232,27 @@ Case 6
         End Select
     Next i
 
-Case 7
-    For i = 1 To UBound(pBMAStandardRates)
-        Select Case i
-        
-        Case Is <= 10
-            ''i. Year 1 spot rate 0.5% that goes to 1% after 10 years
-            temp = 0.005 + 0.005 * (i - 1) / 10
-            'add the temp value to the bermuda rates
-            pBMACurrentScenarioRates(i) = WorksheetFunction.Max(0, pBMAStandardRates(i) + temp)
-        
-        Case Is <= 30
-            'Start at 1% and and increase linearly over 20 years to +1.5%
-            temp = 0.01 + 0.005 * (i - 11) / 20
-            'add the temp value to the bermuda rates
-            pBMACurrentScenarioRates(i) = WorksheetFunction.Max(0, pBMAStandardRates(i) + temp)
-        Case Else
-            'iii. Year 30 spot rate +1.5%
-            temp = 0.015
-            pBMACurrentScenarioRates(i) = WorksheetFunction.Max(0, pBMAStandardRates(i) + temp)
-        End Select
-    Next i
+'Case 7
+'    For i = 1 To UBound(pBMAStandardRates)
+'        Select Case i
+'
+'        Case Is <= 10
+'            ''i. Year 1 spot rate 0.5% that goes to 1% after 10 years
+'            temp = 0.005 + 0.005 * (i - 1) / 10
+'            'add the temp value to the bermuda rates
+'            pBMACurrentScenarioRates(i) = WorksheetFunction.Max(0, pBMAStandardRates(i) + temp)
+'
+'        Case Is <= 30
+'            'Start at 1% and and increase linearly over 20 years to +1.5%
+'            temp = 0.01 + 0.005 * (i - 11) / 20
+'            'add the temp value to the bermuda rates
+'            pBMACurrentScenarioRates(i) = WorksheetFunction.Max(0, pBMAStandardRates(i) + temp)
+'        Case Else
+'            'iii. Year 30 spot rate +1.5%
+'            temp = 0.015
+'            pBMACurrentScenarioRates(i) = WorksheetFunction.Max(0, pBMAStandardRates(i) + temp)
+'        End Select
+'    Next i
 'Case 8
 '
 '    For i = 1 To UBound(pBMAStandardRates)
@@ -277,6 +277,48 @@ Case 7
 '            pBMACurrentScenarioRates(i) = WorksheetFunction.Max(0, pBMAStandardRates(i) + temp)
 '        End Select
 '    Next i
+Case 7
+
+    For i = 1 To UBound(pBMAStandardRates10)
+        Select Case i
+
+        Case Is <= 10
+            ''i. Year 1 spot rate -1.5% that goes to -1% after 10 years
+            temp = -0.0155 + 0.005 * (i) / 10
+            'add the temp value to the bermuda rates
+            pBMACurrentScenario10(i) = WorksheetFunction.Max(0, pBMAStandardRates10(i) + temp)
+
+        Case Is <= 30
+            'Start at -1% and and decrease linearly over 20 years to -0.5%
+            temp = -0.01025 + 0.005 * (i - 10) / 20
+            'add the temp value to the bermuda rates
+            pBMACurrentScenario10(i) = WorksheetFunction.Max(0, pBMAStandardRates10(i) + temp)
+        Case Else
+            temp = -0.005
+            pBMACurrentScenario10(i) = WorksheetFunction.Max(0, pBMAStandardRates10(i) + temp)
+        End Select
+    Next i
+
+    ' recreate the time 0 structure
+    For i = 1 To UBound(pBMAStandardRates)
+        
+        Select Case i
+        Case Is <= 10
+        pBMACurrentScenarioRates(i) = pBMAStandardRates(i)
+
+        Case Else
+        'forward rate between 0-10 is spot compounded
+        temp = (1 + pBMACurrentScenarioRates(10)) ^ 10
+        maxtime = Application.WorksheetFunction.Min(90, i - futureT)
+        temp2 = (1 + pBMACurrentScenario10(maxtime)) ^ (maxtime)
+        temp3 = (temp * temp2) ^ (1 / i)
+        pBMACurrentScenarioRates(i) = temp3 - 1
+
+        End Select
+        
+        Next i
+
+
 
 Case 8
     For i = 1 To UBound(pBMAStandardRates10)
@@ -288,7 +330,7 @@ Case 8
             'add the temp value to the bermuda rates
             pBMACurrentScenario10(i) = WorksheetFunction.Max(0, pBMAStandardRates10(i) + temp)
 
-        Case Is <= 31
+        Case Is <= 30
             'Start at -1% and and decrease linearly over 20 years to -0.5%
             temp = 0.01025 - 0.005 * (i - 10) / 20
             'add the temp value to the bermuda rates
@@ -302,13 +344,13 @@ Case 8
     ' recreate the time 0 structure
     For i = 1 To UBound(pBMAStandardRates)
         Select Case i
-        Case Is < 10
+        Case Is <= 10
         pBMACurrentScenarioRates(i) = pBMAStandardRates(i)
 
         Case Else
         'forward rate between 0-10 is spot compounded
-        temp = (1 + pBMACurrentScenarioRates(9)) ^ 9
-        maxtime = Application.WorksheetFunction.Min(90, i - futureT + 1)
+        temp = (1 + pBMACurrentScenarioRates(10)) ^ 10
+        maxtime = Application.WorksheetFunction.Min(90, i - futureT)
         temp2 = (1 + pBMACurrentScenario10(maxtime)) ^ (maxtime)
         temp3 = (temp * temp2) ^ (1 / i)
         pBMACurrentScenarioRates(i) = temp3 - 1

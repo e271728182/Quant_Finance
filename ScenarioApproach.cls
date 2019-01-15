@@ -78,6 +78,8 @@ Public Sub init()
  
      'add the spread above the BMA curve we are entilted to
      Me.bmaRates.addSpreadToBMACurves
+     Me.bmaRates.createFutureSpot
+
     'initializing the liability cf
     Me.liab.init
     Me.pLiabilityCollection.Add Item:=liab, key:=liab.ID

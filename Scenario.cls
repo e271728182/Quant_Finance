@@ -39,6 +39,6 @@ discountVector(0) = 1
 
 'creating a discount curve
 For count = 1 To UBound(pBMAScenarioRates)
-discountVector(count) = (1 + pBMAScenarioRates(count)) ^ -count
+discountVector(count) = (1 + pBMAScenarioRates(count)) ^ -(count + range("Time_elapsed_in_current_year"))
 Next count
 End Sub
