@@ -1,5 +1,27 @@
 
 import QuantLib as ql
+import pandas as pd
+import numpy as np
+#to correct later on with app
+
+def extractInfoFromCurve(valDate,originScenCurve,xSpreads,colNames,spotCurve):
+    rates=[]
+    dates=list(spotCurve.dates())
+    
+    years=0
+    __scenCurve = ql.SpreadedLinearZeroInterpolatedTermStructure(ql.YieldTermStructureHandle(originScenCurve),[ ql.QuoteHandle(q) for q in xSpreads ],dates)
+   
+    for t in range(0,len(xSpreads)):
+        #years=years+1
+        date=dates[t]
+        #nb years between valuation date and future date
+        yearPassed=ql.ActualActual().yearFraction(valDate, date)
+        #if yearPassed>97:
+            #break
+        #append to the list
+        rates.append(__scenCurve.zeroRate(yearPassed,ql.Compounded).rate())
+    #reutrns a dataframe of date & scenario curve    
+    return pd.DataFrame(list(zip(dates, rates)),columns=colNames)
 
 def spotRateMatch(guess,ScenCurve,baseCurve,todayDate,spotDate,spreads,target,indx):
     
@@ -8,7 +30,7 @@ def spotRateMatch(guess,ScenCurve,baseCurve,todayDate,spotDate,spreads,target,in
     baseCurveHandle = ql.YieldTermStructureHandle(baseCurve)
     
     spreads[indx].setValue(guess)
-    yearPassed=ql.Thirty360().yearFraction(todayDate, spotDate)
+    yearPassed=ql.ActualActual().yearFraction(todayDate, spotDate)
     #yearPassed=indx
     
     scenHandle=ql.YieldTermStructureHandle(ScenCurve)
@@ -21,7 +43,7 @@ def spotRateMatch(guess,ScenCurve,baseCurve,todayDate,spotDate,spreads,target,in
 def forwardMatch(guess,target,todayDate,fDate,spreads,ScenCurve,baseCurve,nbfutureYears):
     #print('X')
     #futureDate=ql.TARGET().advance(todaysDate,nbfutureYears,Years)
-    futureDate=fDate
+    #futureDate=fDate
     baseCurveHandle = ql.YieldTermStructureHandle(baseCurve)
     
     spreads[nbfutureYears].setValue(guess)
@@ -37,4 +59,4 @@ def forwardMatch(guess,target,todayDate,fDate,spreads,ScenCurve,baseCurve,nbfutu
     #print(scenZeroRate)
     #print(spreads[nbfutureYears].value())
     #print(scenZeroRate-baseZeroRate-target)
-    return scenZeroRate-baseZeroRate-target
+    return (scenZeroRate-baseZeroRate-target)
