@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 #to correct later on with app
 
-def extractInfoFromCurve(valDate,originScenCurve,xSpreads,colNames,spotCurve):
+def extract_info_from_curve(valDate,originScenCurve,xSpreads,colNames,spotCurve):
     rates=[]
     dates=list(spotCurve.dates())
     
@@ -23,7 +23,7 @@ def extractInfoFromCurve(valDate,originScenCurve,xSpreads,colNames,spotCurve):
     #reutrns a dataframe of date & scenario curve    
     return pd.DataFrame(list(zip(dates, rates)),columns=colNames)
 
-def spotRateMatch(guess,ScenCurve,baseCurve,todayDate,spotDate,spreads,target,indx):
+def spot_rate_match(guess,ScenCurve,baseCurve,todayDate,spotDate,spreads,target,indx):
     
     #futureDate=ql.TARGET().advance(todaysDate,nbfutureYears,Years)
     futureDate=spotDate
@@ -40,7 +40,7 @@ def spotRateMatch(guess,ScenCurve,baseCurve,todayDate,spotDate,spreads,target,in
     
 
     
-def forwardMatch(guess,target,todayDate,fDate,spreads,ScenCurve,baseCurve,nbfutureYears):
+def forward_match(guess,target,todayDate,fDate,spreads,ScenCurve,baseCurve,nbfutureYears):
     #print('X')
     #futureDate=ql.TARGET().advance(todaysDate,nbfutureYears,Years)
     #futureDate=fDate
