@@ -3,9 +3,38 @@ import QuantLib as ql
 import pandas as pd
 import numpy as np
 from scipy.optimize import newton, root_scalar
-
+from dataclasses import dataclass
 #to correct later on with app
+#name convention for variables,functions and classes
+#Since functions and classes depend largely on QuantLib, the same naming convention has been applied
+#for functions: my_function --> all lower cases with underscore
+#variable: myVariable --> Pascal Case
+#Classes: MyClassNameIs-->Camel Case
 
+
+#STRUCTS
+#close equivalent of a Struct. essentially, a class with no methods and defaults parameters used to share common informations used across classes and functions.
+
+@dataclass
+class DateTimeStruct:
+    effectiveDate:ql.Date = ql.Date(30, 9, 2019)
+    terminationDate = ql.Date(30, 9, 2118)
+    tenor = ql.Period(ql.Annual)
+    calendar = ql.UnitedStates()
+    businessConvention = ql.Following
+    terminationBusinessConvention = ql.Following
+    dateGeneration = ql.DateGeneration.Forward
+    endOfMonth = True
+
+@dataclass
+class IntRatesStruct:
+    interpolation = ql.Linear()
+    compounding = ql.Compounded
+    compoundingFrequency = ql.Annual
+    dayCount=ql.ActualActual()
+
+    
+    
 def extract_info_from_curve(valDate,originScenCurve,xSpreads,colNames,spotCurve):
     rates=[]
     dates=list(spotCurve.dates())
@@ -25,13 +54,14 @@ def extract_info_from_curve(valDate,originScenCurve,xSpreads,colNames,spotCurve)
     #reutrns a dataframe of date & scenario curve    
     return pd.DataFrame(list(zip(dates, rates)),columns=colNames)
 
-def calibrate_term_structure(baseSpotCurve,listSpreads,startDate,name):
+
+def calibrate_term_structure(baseSpotCurve,listSpreads,startDate):
     dates=list(baseSpotCurve.dates())
     spreads = [ ql.SimpleQuote(0.0) for n in dates ] # null spreads to begin
     scenCurve = ql.SpreadedLinearZeroInterpolatedTermStructure(ql.YieldTermStructureHandle(baseSpotCurve),[ql.QuoteHandle(q) for q in spreads],dates)
     
    
-    colname=name
+
     for run in range(1,3):
         for t in range(1,100):
             if t>35:
