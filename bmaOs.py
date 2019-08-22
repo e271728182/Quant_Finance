@@ -33,7 +33,45 @@ class IntRatesStruct:
     compoundingFrequency = ql.Annual
     dayCount=ql.ActualActual()
 
+def create_schedule(datetimeStruct):
     
+    __effectiveDate = datetimeStruct.effectiveDate
+    __terminationDate = datetimeStruct.terminationDate
+    __tenor = datetimeStruct.tenor
+    __calendar = datetimeStruct.calendar
+    __businessConvention = datetimeStruct.businessConvention
+    __terminationBusinessConvention = datetimeStruct.terminationBusinessConvention
+    __dateGeneration = datetimeStruct.dateGeneration
+    __endOfMonth = datetimeStruct.endOfMonth
+    #creating the schedule
+    schedule = ql.Schedule(__effectiveDate,
+                             __terminationDate,
+                             __tenor,
+                             __calendar,
+                             __businessConvention,__terminationBusinessConvention,
+                             __dateGeneration,
+                             __endOfMonth)
+    
+    return schedule
+
+
+def create_spotCurve(spotValues,schedule,datetimeStruct,intRateStruct):
+    #spotRates = spotValues.tolist()[0:100]
+#dates that are incremented in yearts for the lenght of the term structure
+#spotDates=[TARGET().advance(todaysDate,n,Years) for n in range(1,101)]
+    spotDates=list(schedule)
+
+    #dayCount = ql.Thirty360()
+    
+    __calendar = datetimeStruct.calendar
+    __interpolation = intRateStruct.interpolation
+    __compounding = intRateStruct.compounding
+    __compoundingFrequency = intRateStruct.compoundingFrequency
+    __dayCount=intRateStruct.dayCount
+    spotCurve = ql.ZeroCurve(spotDates, spotValues, __dayCount, __calendar, __interpolation,__compounding, __compoundingFrequency)
+    spotCurveHandle = ql.YieldTermStructureHandle(spotCurve)
+    return spotCurve
+
     
 def extract_info_from_curve(valDate,originScenCurve,xSpreads,colNames,spotCurve):
     rates=[]
