@@ -15,6 +15,14 @@ from dataclasses import dataclass
 #STRUCTS
 #close equivalent of a Struct. essentially, a class with no methods and defaults parameters used to share common informations used across classes and functions.
 
+
+@dataclass
+class ActuarialOutput:
+    valuationDate:ql.Date=ql.Date(30, 9, 2019)
+    engine:str="AXIS"
+    freqency:str='Q'
+        
+
 @dataclass
 class DateTimeStruct:
     effectiveDate:ql.Date = ql.Date(30, 9, 2019)
@@ -32,7 +40,8 @@ class IntRatesStruct:
     compounding = ql.Compounded
     compoundingFrequency = ql.Annual
     dayCount=ql.ActualActual()
-
+    isFlat=False
+    
 def create_schedule(datetimeStruct):
     
     __effectiveDate = datetimeStruct.effectiveDate
