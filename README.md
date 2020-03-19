@@ -1,19 +1,14 @@
 # Readme
-VBA code to create BMA scenarios and reserves.
-Code has some reference to named ranges and is not maintained but can nonetheless be used
-
+This repository contains code that leverages the QuanLib library to perform various financial mathematics task such as discounting cash flows to calibrating interest rates curve.
 ## Files
-### ScenarioApproach.cls
-class that perform the evaluation of 8 scenarios
+### quantFin.py
+main code library for discounting and calibrating
+### ActuarialFunTime.ipynb
 
-### BmaInterestRates
+Notebook with example on how to discount cash flow and blue print of a relational data model
+### QuantlibB.ipynb
+Notebook with example on how to calibrate term strucure of interest according to various requirements
 
-Creates the 8 discount curves required for performing scenario evaluation
-### Scenario.cls
-Class to implement a scenario
+### GradientSolver.ipynb
+Gradient descent algorithm for cash flow matching
 
-### liability.cls
-liability class
-
-### asset.cls
-Asset class
