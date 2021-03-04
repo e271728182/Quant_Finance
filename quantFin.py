@@ -58,7 +58,7 @@ class ActuarialBucket:
         """
         returns a numpy array with a beginning of year structure
         """
-        ass_set=wareHouse.assump_set_dept[self.assumption_set_key]
+        ass_set=wareHouse.assump_set_dept[policy.act_assumpset_id]
         mortality=wareHouse.mort_dept[ass_set.mortality_id]
         
         key=key=str(ass_set.mortality_id)+'-'+str(policy.age)+'-sx'
@@ -87,7 +87,7 @@ class ActuarialBucket:
     
     def calculate_dx(self,policy,wareHouse):
         
-        ass_set=wareHouse.assump_set_dept[self.assumption_set_key]
+        ass_set=wareHouse.assump_set_dept[policy.act_assumpset_id]
         mortality=wareHouse.mort_dept[ass_set.mortality_id]
         
         key=key=str(ass_set.mortality_id)+'-'+str(policy.age)+'-dx'
@@ -104,7 +104,7 @@ class ActuarialBucket:
      
     def calculate_qx(self,policy,wareHouse):
         
-        ass_set=wareHouse.assump_set_dept[self.assumption_set_key]
+        ass_set=wareHouse.assump_set_dept[policy.act_assumpset_id]
         mortality=wareHouse.mort_dept[ass_set.mortality_id]
         
         key=str(ass_set.mortality_id)+'-'+str(policy.age)+'-qx'
